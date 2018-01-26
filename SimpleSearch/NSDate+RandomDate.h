@@ -1,15 +1,15 @@
 //
-//  ViewController.h
+//  NSDate+RandomDate.h
 //  SimpleSearch
 //
 //  Created by Pavel on 26.01.2018.
 //  Copyright © 2018 Pavel Maiboroda. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@interface ViewController : UITableViewController
+@interface NSDate (RandomDate)
 
+- (NSDate *)randomDateForStudent;
 
 @end
-
