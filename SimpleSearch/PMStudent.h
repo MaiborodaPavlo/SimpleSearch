@@ -16,4 +16,7 @@
 
 + (PMStudent *) randomStudent;
 
+- (NSInteger) getMonthOfBirthday;
+- (NSString *) getMonthNameOfBirthday;
+
 @end

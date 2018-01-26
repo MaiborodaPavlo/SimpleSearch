@@ -15,6 +15,7 @@
 		E909F1DA201B5597002D713E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E909F1D9201B5597002D713E /* main.m */; };
 		E909F1E2201B564F002D713E /* PMStudent.m in Sources */ = {isa = PBXBuildFile; fileRef = E909F1E1201B564F002D713E /* PMStudent.m */; };
 		E909F1E5201B58C3002D713E /* NSDate+RandomDate.m in Sources */ = {isa = PBXBuildFile; fileRef = E909F1E4201B58C3002D713E /* NSDate+RandomDate.m */; };
+		E909F1E8201B6417002D713E /* PMSection.m in Sources */ = {isa = PBXBuildFile; fileRef = E909F1E7201B6417002D713E /* PMSection.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,8 @@
 		E909F1E1201B564F002D713E /* PMStudent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PMStudent.m; sourceTree = "<group>"; };
 		E909F1E3201B58C3002D713E /* NSDate+RandomDate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDate+RandomDate.h"; sourceTree = "<group>"; };
 		E909F1E4201B58C3002D713E /* NSDate+RandomDate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDate+RandomDate.m"; sourceTree = "<group>"; };
+		E909F1E6201B6417002D713E /* PMSection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMSection.h; sourceTree = "<group>"; };
+		E909F1E7201B6417002D713E /* PMSection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PMSection.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,8 @@
 				E909F1E4201B58C3002D713E /* NSDate+RandomDate.m */,
 				E909F1E0201B564F002D713E /* PMStudent.h */,
 				E909F1E1201B564F002D713E /* PMStudent.m */,
+				E909F1E6201B6417002D713E /* PMSection.h */,
+				E909F1E7201B6417002D713E /* PMSection.m */,
 				E909F1CA201B5597002D713E /* AppDelegate.h */,
 				E909F1CB201B5597002D713E /* AppDelegate.m */,
 				E909F1CD201B5597002D713E /* ViewController.h */,
@@ -152,6 +157,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E909F1E8201B6417002D713E /* PMSection.m in Sources */,
 				E909F1E5201B58C3002D713E /* NSDate+RandomDate.m in Sources */,
 				E909F1CF201B5597002D713E /* ViewController.m in Sources */,
 				E909F1DA201B5597002D713E /* main.m in Sources */,

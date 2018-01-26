@@ -8,9 +8,11 @@
 
 #import "ViewController.h"
 #import "PMStudent.h"
+#import "PMSection.h"
 
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 
+@property (strong, nonatomic) NSArray *sectionsArray;
 @property (strong, nonatomic) NSMutableArray *studentsArray;
 
 @end
@@ -20,11 +22,43 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.studentsArray = [NSMutableArray array];
+    // Generate random Students
+    NSMutableArray *array = [NSMutableArray array];
     
     for (int i = 0; i < arc4random() % 1001; i++) {
-        [self.studentsArray addObject: [PMStudent randomStudent]];
+        [array addObject: [PMStudent randomStudent]];
     }
+    
+    // Sorting
+    
+    [array sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        
+        PMStudent *stud1 = obj1;
+        PMStudent *stud2 = obj2;
+        
+        NSCalendar *currentCalendar = [NSCalendar currentCalendar];
+
+        NSInteger month1 = [currentCalendar component: NSCalendarUnitMonth fromDate: stud1.dateOfBirthday] ;
+        NSInteger month2 = [currentCalendar component: NSCalendarUnitMonth fromDate: stud2.dateOfBirthday] ;
+
+        if (month1 > month2) {
+            return NSOrderedDescending;
+        } else if(month1 < month2) {
+            return NSOrderedAscending;
+        } else {
+            return NSOrderedSame;
+        }
+        
+    }];
+    
+    self.studentsArray = array;
+    
+    // Generate section
+    
+    self.sectionsArray = [NSMutableArray array];
+    self.sectionsArray = [self generateSectionsFromArray: self.studentsArray];
+    
+    
 }
 
 
@@ -33,12 +67,50 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Help Methods
+
+- (NSArray *) generateSectionsFromArray: (NSArray *) array {
+
+    NSMutableArray *sectionsArray = [NSMutableArray array];
+    NSInteger currentMonth = 0;
+    
+    for (PMStudent *student in array) {
+        
+        NSInteger month = [student getMonthOfBirthday];
+        PMSection *section = nil;
+        
+        if (month != currentMonth) {
+            section = [[PMSection alloc] init];
+            section.sectionName = [student getMonthNameOfBirthday];
+            currentMonth = month;
+            [sectionsArray addObject: section];
+            
+        } else {
+            section = [sectionsArray lastObject];
+        }
+        [section.itemsArray addObject: student];
+    }
+    
+    return sectionsArray;
+}
+
 
 #pragma mark - UiTableViewDataSource
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    
+    return [self.sectionsArray count];
+}
+
+- (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return [[self.sectionsArray objectAtIndex: section] sectionName];
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
-    return [self.studentsArray count];
+    PMSection *sec = [self.sectionsArray objectAtIndex: section];
+    
+    return [sec.itemsArray count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -51,7 +123,9 @@
         cell = [[UITableViewCell alloc] initWithStyle: UITableViewCellStyleValue1 reuseIdentifier: identifier];
     }
     
-    PMStudent *student = [self.studentsArray objectAtIndex: indexPath.row];
+    PMSection *section = [self.sectionsArray objectAtIndex: indexPath.section];
+    PMStudent *student = [section.itemsArray objectAtIndex: indexPath.row];
+    
     cell.textLabel.text = [NSString stringWithFormat: @"%@ %@", student.firstName, student.lastName];
     
     static NSDateFormatter *dateFormatter = nil;
