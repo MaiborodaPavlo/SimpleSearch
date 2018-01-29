@@ -58,6 +58,9 @@
     self.sectionsArray = [NSMutableArray array];
     self.sectionsArray = [self generateSectionsFromArray: self.studentsArray];
     
+    for (PMSection *section in self.sectionsArray) {
+        [section sortSectionArray];
+    }
     
 }
 
