@@ -10,7 +10,7 @@
 #import "PMStudent.h"
 #import "PMSection.h"
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate>
 
 @property (strong, nonatomic) NSArray *sectionsArray;
 @property (strong, nonatomic) NSMutableArray *studentsArray;
@@ -56,7 +56,8 @@
     // Generate section
     
     self.sectionsArray = [NSMutableArray array];
-    self.sectionsArray = [self generateSectionsFromArray: self.studentsArray];
+    //self.sectionsArray = [self generateSectionsFromArray: self.studentsArray];
+    self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: self.searchBar.text];
     
     for (PMSection *section in self.sectionsArray) {
         [section sortSectionArray];
@@ -78,6 +79,35 @@
     NSInteger currentMonth = 0;
     
     for (PMStudent *student in array) {
+        
+        NSInteger month = [student getMonthOfBirthday];
+        PMSection *section = nil;
+        
+        if (month != currentMonth) {
+            section = [[PMSection alloc] init];
+            section.sectionName = [student getMonthNameOfBirthday];
+            currentMonth = month;
+            [sectionsArray addObject: section];
+            
+        } else {
+            section = [sectionsArray lastObject];
+        }
+        [section.itemsArray addObject: student];
+    }
+    
+    return sectionsArray;
+}
+
+- (NSArray *) generateSectionsFromArray: (NSArray *) array withFilter: (NSString *) filterString {
+    
+    NSMutableArray *sectionsArray = [NSMutableArray array];
+    NSInteger currentMonth = 0;
+    
+    for (PMStudent *student in array) {
+        
+        if ([filterString length] > 0 && ([[student.firstName lowercaseString] rangeOfString: [filterString lowercaseString]].location == NSNotFound && [[student.lastName lowercaseString] rangeOfString: [filterString lowercaseString]].location == NSNotFound)) {
+            continue;
+        }
         
         NSInteger month = [student getMonthOfBirthday];
         PMSection *section = nil;
@@ -160,6 +190,24 @@
 }
 
 
+#pragma mark - UISearchBarDelegate
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    
+    [searchBar setShowsCancelButton: YES animated: YES];
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    
+    [searchBar resignFirstResponder];
+    [searchBar setShowsCancelButton: NO animated: YES];
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
+
+    self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: searchText];
+    [self.tableView reloadData];
+}
 
 
 
