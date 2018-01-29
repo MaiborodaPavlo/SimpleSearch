@@ -143,6 +143,22 @@
     return cell;
 }
 
+#pragma mark - UITableViewDelegate
+
+- (nullable NSArray<NSString *> *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+
+    NSMutableArray *returnArray = [NSMutableArray array];
+    NSString *firstLetter = nil;
+    
+    for (PMSection *section in self.sectionsArray) {
+        
+        firstLetter = [section.sectionName substringToIndex: 1];
+        [returnArray addObject: firstLetter];
+    }
+    
+    return returnArray;
+}
+
 
 
 
