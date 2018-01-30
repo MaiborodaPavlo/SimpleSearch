@@ -19,6 +19,12 @@
 
 @end
 
+typedef enum {
+    PMScopeBarIndexDate,
+    PMScopeBarIndexName,
+    PMScopeBarIndexLastName
+} PMScopeBarIndex;
+
 @implementation ViewController
 
 - (void)viewDidLoad {
@@ -131,6 +137,78 @@
     return sectionsArray;
 }
 
+- (NSArray *) generateSectionsFromArrayByName: (NSArray *) array withFilter: (NSString *) filterString {
+
+    NSMutableArray *sectionsArray = [NSMutableArray array];
+    NSString *currentLetter = nil;
+    
+    NSMutableArray *studentsArray = [NSMutableArray arrayWithArray: array];
+    
+    NSSortDescriptor *sortDescriptorName = [[NSSortDescriptor alloc] initWithKey: @"firstName" ascending: YES];
+    NSSortDescriptor *sortDescriptorLastName = [[NSSortDescriptor alloc] initWithKey: @"lastName" ascending: YES];
+    
+    [studentsArray sortUsingDescriptors: @[sortDescriptorName, sortDescriptorLastName]];
+
+    for (PMStudent *student in studentsArray) {
+        
+        if ([filterString length] > 0 && ([[student.firstName lowercaseString] rangeOfString: [filterString lowercaseString]].location == NSNotFound && [[student.lastName lowercaseString] rangeOfString: [filterString lowercaseString]].location == NSNotFound)) {
+            continue;
+        }
+        
+        NSString *firstLetter = [student.firstName substringToIndex: 1];
+        PMSection *section = nil;
+        
+        if (![currentLetter isEqualToString: firstLetter]) {
+            section = [[PMSection alloc] init];
+            section.sectionName = firstLetter;
+            currentLetter = firstLetter;
+            [sectionsArray addObject: section];
+        } else {
+            section = [sectionsArray lastObject];
+        }
+        
+        [section.itemsArray addObject: student];
+    }
+    
+    return sectionsArray;
+}
+
+- (NSArray *) generateSectionsFromArrayByLastName: (NSArray *) array withFilter: (NSString *) filterString {
+    
+    NSMutableArray *sectionsArray = [NSMutableArray array];
+    NSString *currentLetter = nil;
+    
+    NSMutableArray *studentsArray = [NSMutableArray arrayWithArray: array];
+    
+    NSSortDescriptor *sortDescriptorName = [[NSSortDescriptor alloc] initWithKey: @"firstName" ascending: YES];
+    NSSortDescriptor *sortDescriptorLastName = [[NSSortDescriptor alloc] initWithKey: @"lastName" ascending: YES];
+    
+    [studentsArray sortUsingDescriptors: @[sortDescriptorLastName, sortDescriptorName]];
+    
+    for (PMStudent *student in studentsArray) {
+        
+        if ([filterString length] > 0 && ([[student.firstName lowercaseString] rangeOfString: [filterString lowercaseString]].location == NSNotFound && [[student.lastName lowercaseString] rangeOfString: [filterString lowercaseString]].location == NSNotFound)) {
+            continue;
+        }
+        
+        NSString *firstLetter = [student.lastName substringToIndex: 1];
+        PMSection *section = nil;
+        
+        if (![currentLetter isEqualToString: firstLetter]) {
+            section = [[PMSection alloc] init];
+            section.sectionName = firstLetter;
+            currentLetter = firstLetter;
+            [sectionsArray addObject: section];
+        } else {
+            section = [sectionsArray lastObject];
+        }
+        
+        [section.itemsArray addObject: student];
+    }
+    
+    return sectionsArray;
+}
+
 - (void) generateSectionsInBackgroundFromArray: (NSArray *) array withFilter: (NSString *) filterString {
     
     [self.currentOperation cancel];
@@ -138,7 +216,22 @@
     __weak ViewController *weakSelf = self;
     
     self.currentOperation = [NSBlockOperation blockOperationWithBlock:^{
-        NSArray *sectionsArray = [weakSelf generateSectionsFromArray: array withFilter: filterString];
+        
+        NSArray *sectionsArray = nil;
+        
+        switch (self.searchBar.selectedScopeButtonIndex) {
+            case PMScopeBarIndexDate:
+                sectionsArray = [weakSelf generateSectionsFromArray: array withFilter: filterString];
+                break;
+            case PMScopeBarIndexName:
+                sectionsArray = [weakSelf generateSectionsFromArrayByName: array withFilter: filterString];
+                break;
+            case PMScopeBarIndexLastName:
+                sectionsArray = [weakSelf generateSectionsFromArrayByLastName: array withFilter: filterString];
+                break;
+            default:
+                break;
+        }
         
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.sectionsArray = sectionsArray;
@@ -229,12 +322,13 @@
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
 
-    // self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: searchText];
-    // [self.tableView reloadData];
-    
     [self generateSectionsInBackgroundFromArray: self.studentsArray withFilter: searchText];
 }
 
+- (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
+    
+    [self generateSectionsInBackgroundFromArray: self.studentsArray withFilter: self.searchBar.text];
+}
 
 
 
