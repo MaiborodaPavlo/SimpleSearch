@@ -15,6 +15,8 @@
 @property (strong, nonatomic) NSArray *sectionsArray;
 @property (strong, nonatomic) NSMutableArray *studentsArray;
 
+@property (strong, nonatomic) NSOperation *currentOperation;
+
 @end
 
 @implementation ViewController
@@ -56,8 +58,10 @@
     // Generate section
     
     self.sectionsArray = [NSMutableArray array];
-    //self.sectionsArray = [self generateSectionsFromArray: self.studentsArray];
-    self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: self.searchBar.text];
+    // self.sectionsArray = [self generateSectionsFromArray: self.studentsArray];
+    // self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: self.searchBar.text];
+    
+    [self generateSectionsInBackgroundFromArray: self.studentsArray withFilter: self.searchBar.text];
     
     for (PMSection *section in self.sectionsArray) {
         [section sortSectionArray];
@@ -125,6 +129,26 @@
     }
     
     return sectionsArray;
+}
+
+- (void) generateSectionsInBackgroundFromArray: (NSArray *) array withFilter: (NSString *) filterString {
+    
+    [self.currentOperation cancel];
+    
+    __weak ViewController *weakSelf = self;
+    
+    self.currentOperation = [NSBlockOperation blockOperationWithBlock:^{
+        NSArray *sectionsArray = [weakSelf generateSectionsFromArray: array withFilter: filterString];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            weakSelf.sectionsArray = sectionsArray;
+            [weakSelf.tableView reloadData];
+            
+            self.currentOperation = nil;
+        });
+    }];
+    
+    [self.currentOperation start];
 }
 
 
@@ -205,8 +229,10 @@
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
 
-    self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: searchText];
-    [self.tableView reloadData];
+    // self.sectionsArray = [self generateSectionsFromArray: self.studentsArray withFilter: searchText];
+    // [self.tableView reloadData];
+    
+    [self generateSectionsInBackgroundFromArray: self.studentsArray withFilter: searchText];
 }
 
 
